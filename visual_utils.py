@@ -140,13 +140,44 @@ class ProcessVideo:
         cap.release()
         out.release()
         cv2.destroyAllWindows()
+    
+    def remove_image_background(self, image_path, background_color):
+        # Initialize the selfie segmentation model
+        mp_selfie_segmentation = mp.solutions.selfie_segmentation
+        selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
 
-video_path = './cropped_video.mp4'
+        # Read the image
+        image = cv2.imread(image_path)
+        height, width, _ = image.shape
+
+        # Convert the image to RGB
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # Process the image to get the segmentation results
+        results = selfie_segmentation.process(image_rgb)
+
+        # Get the segmentation mask
+        segmentation_mask = results.segmentation_mask
+
+        # Threshold to create a binary mask
+        condition = segmentation_mask > 0.5
+
+        # Create an output image with the same size as the input image, filled with the background_color
+        output_image = np.zeros_like(image)
+        output_image[:] = background_color
+
+        # Apply the condition to the original image where the condition is True (foreground)
+        output_image[condition] = image[condition]
+        cv2.imwrite('./images/cat_no_background.png', output_image)
+        return output_image
+video_path = './video_clip.mp4'
 csv_path = './dance_landmarks.csv'
 audio_path = './audio.mp3'
 output_path = './result.mp4'
+image_path = './cat_with_background.png'
 
 landmark_saver = ProcessVideo(video_path, csv_path)
-landmark_saver.detect_landmarks()  # Detect landmarks.
-landmark_saver.save_to_csv()       # Save landmarks to CSV.
-landmark_saver.get_audio(audio_path=audio_path)
+# landmark_saver.detect_landmarks()  # Detect landmarks.
+# landmark_saver.save_to_csv()       # Save landmarks to CSV.
+# landmark_saver.get_audio(audio_path=audio_path)
+landmark_saver.remove_image_background(image_path, (255, 255, 255))
