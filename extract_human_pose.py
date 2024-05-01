@@ -3,7 +3,7 @@ import cv2
 import csv
 import os
 
-path = '/Users/jiayuanfu/Desktop/video.mp4'
+path = '/Users/hanyibei/Desktop/SP2024/6682/cs6682-project/croped_video.mp4'
 
 def save_landmarks(path):
     # Initialize the pose model
