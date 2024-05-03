@@ -170,7 +170,7 @@ class ProcessVideo:
         output_image[condition] = image[condition]
         cv2.imwrite('./images/cat_no_background.png', output_image)
         return output_image
-video_path = './video_clip.mp4'
+video_path = './cropped_video.mp4'
 csv_path = './dance_landmarks.csv'
 audio_path = './audio.mp3'
 output_path = './result.mp4'
@@ -179,5 +179,5 @@ image_path = './cat_with_background.png'
 landmark_saver = ProcessVideo(video_path, csv_path)
 # landmark_saver.detect_landmarks()  # Detect landmarks.
 # landmark_saver.save_to_csv()       # Save landmarks to CSV.
-# landmark_saver.get_audio(audio_path=audio_path)
-landmark_saver.remove_image_background(image_path, (255, 255, 255))
+landmark_saver.get_audio(audio_path=audio_path)
+# landmark_saver.remove_image_background(image_path, (255, 255, 255))
