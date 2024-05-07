@@ -113,7 +113,12 @@ class ProcessVideo:
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter('output_video.mp4', fourcc, 20.0, (int(cap.get(3)), int(cap.get(4))))
+        
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+        print("Width:", width)
+        print("Height:", height)
         # Instantiate the selfie segmentation model
         with mp_selfie_segmentation.SelfieSegmentation(model_selection=1) as selfie_segmentation:
             while cap.isOpened():
@@ -170,7 +175,7 @@ class ProcessVideo:
         output_image[condition] = image[condition]
         cv2.imwrite('./images/cat_no_background.png', output_image)
         return output_image
-video_path = './video_clip.mp4'
+video_path = './cropped_video.mp4'
 csv_path = './dance_landmarks.csv'
 audio_path = './audio.mp3'
 output_path = './result.mp4'
@@ -180,4 +185,5 @@ landmark_saver = ProcessVideo(video_path, csv_path)
 # landmark_saver.detect_landmarks()  # Detect landmarks.
 # landmark_saver.save_to_csv()       # Save landmarks to CSV.
 # landmark_saver.get_audio(audio_path=audio_path)
-landmark_saver.remove_image_background(image_path, (255, 255, 255))
+# landmark_saver.remove_image_background(image_path, (255, 255, 255))
+landmark_saver.remove_video_background()
