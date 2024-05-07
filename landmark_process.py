@@ -112,14 +112,14 @@ def generate_transfer():
             body_3_y = 1-df.loc[row, 'landmark_25_y']
             body_4_x = (df.loc[row, 'landmark_26_x'] + df.loc[row, 'landmark_24_x']) / 2
             body_4_y = 1-df.loc[row, 'landmark_26_y']
+            if body_4_x > body_3_x:
+                body_4_x, body_3_x = body_3_x, body_4_x
+                body_4_y, body_3_y = body_3_y, body_4_y
+
             body['body_1_x'].append(body_1_x)
             body['body_1_y'].append(body_1_y)
             body['body_2_x'].append(body_2_x)
             body['body_2_y'].append(body_2_y)
-            body['body_3_x'].append(body_3_x)
-            body['body_3_y'].append(body_3_y)
-            body['body_4_x'].append(body_4_x)
-            body['body_4_y'].append(body_4_y)
 
             # extract head
             head_1_x = df.loc[row, 'landmark_8_x']
@@ -127,9 +127,9 @@ def generate_transfer():
             head_2_x = df.loc[row, 'landmark_7_x']
             head_2_y = 1-df.loc[row, 'landmark_2_y']
             head_3_x = df.loc[row, 'landmark_7_x']
-            head_3_y = body_2_y
+            head_3_y = body_2_y-0.03
             head_4_x = df.loc[row, 'landmark_8_x']
-            head_4_y = body_1_y
+            head_4_y = body_1_y-0.03
             head['head_1_x'].append(head_1_x)
             head['head_1_y'].append(head_1_y)
             head['head_2_x'].append(head_2_x)
@@ -146,8 +146,8 @@ def generate_transfer():
             left_leg_2_y = body_4_y - (body_4_y - body_3_y)/3
             left_leg_3_x = df.loc[row, 'landmark_30_x']
             left_leg_3_y = 1 - df.loc[row, 'landmark_30_y']
-            left_leg_4_x = df.loc[row, 'landmark_32_x']
-            left_leg_4_y = 1 - df.loc[row, 'landmark_32_y']
+            left_leg_4_x = df.loc[row, 'landmark_30_x'] - 0.04
+            left_leg_4_y = 1 - df.loc[row, 'landmark_30_y']
             left_leg['left_leg_1_x'].append(left_leg_1_x)
             left_leg['left_leg_1_y'].append(left_leg_1_y)
             left_leg['left_leg_2_x'].append(left_leg_2_x)
@@ -157,13 +157,13 @@ def generate_transfer():
             left_leg['left_leg_4_x'].append(left_leg_4_x)
             left_leg['left_leg_4_y'].append(left_leg_4_y)
 
-            # extract left leg
+            # extract right leg
             right_leg_1_x = body_3_x - (body_3_x - body_4_x) / 3
             right_leg_1_y = body_3_y - (body_3_y - body_4_y) / 3
             right_leg_2_x = body_3_x
             right_leg_2_y = body_3_y
-            right_leg_3_x = df.loc[row, 'landmark_31_x']
-            right_leg_3_y = 1 - df.loc[row, 'landmark_31_y']
+            right_leg_3_x = df.loc[row, 'landmark_29_x'] + 0.04
+            right_leg_3_y = 1 - df.loc[row, 'landmark_29_y']
             right_leg_4_x = df.loc[row, 'landmark_29_x']
             right_leg_4_y = 1 - df.loc[row, 'landmark_29_y']
             right_leg['right_leg_1_x'].append(right_leg_1_x)
@@ -175,16 +175,23 @@ def generate_transfer():
             right_leg['right_leg_4_x'].append(right_leg_4_x)
             right_leg['right_leg_4_y'].append(right_leg_4_y)
 
+            body_3_y -= 0.02
+            body_4_y -= 0.02
+            body['body_3_x'].append(body_3_x)
+            body['body_3_y'].append(body_3_y)
+            body['body_4_x'].append(body_4_x)
+            body['body_4_y'].append(body_4_y)
+
             # extract upper left arm
             upper_left_arm_1_x = df.loc[row, 'landmark_14_x']
-            upper_left_arm_1_y = 1 - df.loc[row, 'landmark_14_y'] - 0.01
+            upper_left_arm_1_y = 1 - df.loc[row, 'landmark_14_y'] - 0.03
             upper_left_arm_2_x = df.loc[row, 'landmark_14_x']
-            upper_left_arm_2_y = upper_left_arm_1_y + 0.02
-            upper_left_arm_3_x = body_1_x
+            upper_left_arm_2_y = upper_left_arm_1_y + 0.06
+            upper_left_arm_3_x = body_1_x + 0.01
             upper_left_arm_3_y = body_1_y
             m = (body_4_y - body_1_y) / (body_4_x - body_1_x)
-            upper_left_arm_4_y = upper_left_arm_3_y - 0.02
-            upper_left_arm_4_x = body_1_x + (upper_left_arm_4_y - body_1_y) / m
+            upper_left_arm_4_y = upper_left_arm_3_y - 0.03
+            upper_left_arm_4_x = body_1_x + (upper_left_arm_4_y - body_1_y) / m + 0.01
             upper_left_arm['upper_left_arm_1_x'].append(upper_left_arm_1_x)
             upper_left_arm['upper_left_arm_1_y'].append(upper_left_arm_1_y)
             upper_left_arm['upper_left_arm_2_x'].append(upper_left_arm_2_x)
@@ -196,9 +203,9 @@ def generate_transfer():
 
             # extract lower left arm
             lower_left_arm_1_x = df.loc[row, 'landmark_18_x']
-            lower_left_arm_1_y = 1 - df.loc[row, 'landmark_18_y']
+            lower_left_arm_1_y = 1 - df.loc[row, 'landmark_20_y'] - 0.015
             lower_left_arm_2_x = df.loc[row, 'landmark_20_x']
-            lower_left_arm_2_y = 1 - df.loc[row, 'landmark_20_y']
+            lower_left_arm_2_y = 1 - df.loc[row, 'landmark_20_y'] + 0.015
             lower_left_arm_3_x = upper_left_arm_2_x
             lower_left_arm_3_y = upper_left_arm_2_y
             lower_left_arm_4_x = upper_left_arm_1_x
@@ -214,14 +221,14 @@ def generate_transfer():
 
             # extract upper right arm
             upper_right_arm_1_x = df.loc[row, 'landmark_13_x']
-            upper_right_arm_1_y = 1 - df.loc[row, 'landmark_13_y'] + 0.01
+            upper_right_arm_1_y = 1 - df.loc[row, 'landmark_13_y'] + 0.03
             upper_right_arm_2_x = df.loc[row, 'landmark_13_x']
-            upper_right_arm_2_y = upper_right_arm_1_y - 0.02
-            upper_right_arm_4_x = body_2_x
+            upper_right_arm_2_y = upper_right_arm_1_y - 0.06
+            upper_right_arm_4_x = body_2_x - 0.01
             upper_right_arm_4_y = body_2_y
             m = (body_3_y - body_2_y) / (body_3_x - body_2_x)
-            upper_right_arm_3_y = upper_right_arm_4_y - 0.02
-            upper_right_arm_3_x = body_2_x + (upper_right_arm_3_y - body_2_y) / m
+            upper_right_arm_3_y = upper_right_arm_4_y - 0.06
+            upper_right_arm_3_x = body_2_x + (upper_right_arm_3_y - body_2_y) / m - 0.01
             upper_right_arm['upper_right_arm_1_x'].append(upper_right_arm_1_x)
             upper_right_arm['upper_right_arm_1_y'].append(upper_right_arm_1_y)
             upper_right_arm['upper_right_arm_2_x'].append(upper_right_arm_2_x)
@@ -233,9 +240,9 @@ def generate_transfer():
 
             # extract lower right arm
             lower_right_arm_1_x = df.loc[row, 'landmark_19_x']
-            lower_right_arm_1_y = 1 - df.loc[row, 'landmark_19_y']
+            lower_right_arm_1_y = 1 - df.loc[row, 'landmark_17_y'] + 0.015
             lower_right_arm_2_x = df.loc[row, 'landmark_17_x']
-            lower_right_arm_2_y = 1 - df.loc[row, 'landmark_17_y']
+            lower_right_arm_2_y = 1 - df.loc[row, 'landmark_17_y'] - 0.015
             lower_right_arm_3_x = upper_right_arm_2_x
             lower_right_arm_3_y = upper_right_arm_2_y
             lower_right_arm_4_x = upper_right_arm_1_x

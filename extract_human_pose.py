@@ -4,7 +4,8 @@ import csv
 import os
 import numpy as np
 
-path = './cropped_video.mp4'
+# path = './cropped_video.mp4'
+path = '/Users/hanyibei/Desktop/SP2024/6682/cs6682-project/croped_video.mp4'
 
 def save_landmarks(path):
     # Initialize the pose model
@@ -15,7 +16,7 @@ def save_landmarks(path):
     cap = cv2.VideoCapture(path)
 
     # Setup CSV file and writer
-    csv_path = os.path.join(os.getcwd(), 'dance_landmarks.csv')
+    csv_path = os.path.join(os.getcwd(), 'dance_landmark.csv')
     # print(csv_path)
     with open(csv_path, mode='w', newline='') as file:
         csv_writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
