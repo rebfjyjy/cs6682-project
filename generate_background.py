@@ -135,7 +135,7 @@ def interpole(x1, y1, x2, y2, x):
 
 def visualize(audio,
               tmp,
-              out = Path("out.mp4"),
+              out = Path("generated_background.mp4"),
               seek=None,
               duration=None,
               rate=60,
@@ -170,28 +170,16 @@ def visualize(audio,
         print(err, file=sys.stderr)
         raise
     # wavs is a list of wav over channels
-    wavs = []
-    if stereo:
-        assert wav.shape[0] == 2, 'stereo requires stereo audio file'
-        wavs.append(wav[0])
-        wavs.append(wav[1])
-    else:
-        wav = wav.mean(0)
-        wavs.append(wav)
-
-    for i, wav in enumerate(wavs):
-        wavs[i] = wav/wav.std()
+    wav = wav.mean(0)
+    wav/wav.std()
 
     window = int(sr * time / bars)
     stride = int(window / oversample)
     # envs is a list of env over channels
-    envs = []
-    for wav in wavs:
-        env = envelope(wav, window, stride)
-        env = np.pad(env, (bars // 2, 2 * bars))
-        envs.append(env)
+    env = envelope(wav, window, stride)
+    env = np.pad(env, (bars // 2, 2 * bars))
 
-    duration = len(wavs[0]) / sr
+    duration = len(wav) / sr
     frames = int(rate * duration)
     smooth = np.hanning(bars)
 
@@ -201,17 +189,16 @@ def visualize(audio,
         off = int(pos)
         loc = pos - off
         denvs = []
-        for env in envs:
-            env1 = env[off * bars:(off + 1) * bars]
-            env2 = env[(off + 1) * bars:(off + 2) * bars]
+        env1 = env[off * bars:(off + 1) * bars]
+        env2 = env[(off + 1) * bars:(off + 2) * bars]
 
-            # we want loud parts to be updated faster
-            maxvol = math.log10(1e-4 + env2.max()) * 10
-            speedup = np.clip(interpole(-6, 0.5, 0, 2, maxvol), 0.5, 2)
-            w = sigmoid(speed * speedup * (loc - 0.5))
-            denv = (1 - w) * env1 + w * env2
-            denv *= smooth
-            denvs.append(denv)
+        # we want loud parts to be updated faster
+        maxvol = math.log10(1e-4 + env2.max()) * 10
+        speedup = np.clip(interpole(-6, 0.5, 0, 2, maxvol), 0.5, 2)
+        w = sigmoid(speed * speedup * (loc - 0.5))
+        denv = (1 - w) * env1 + w * env2
+        denv *= smooth
+        denvs.append(denv)
         draw_env(denvs, tmp / f"{idx:06d}.png", fg_color, bg_color, size)
 
     audio_cmd = []
