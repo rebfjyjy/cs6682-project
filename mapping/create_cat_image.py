@@ -86,8 +86,10 @@ class CreateCatImage:
     def warp_and_blend(self, part_image, src_points, dst_points, canvas, width, height):
         # Compute the homography matrix
         src_points1 = src_points[[0, 1, 2]]
+        src_points1[[2]] = (src_points[[2]] + src_points[[3]]) / 2
         # src_points2 = src_points[0, 2, 3]
         dst_points1 = dst_points[[0, 1, 2]]
+        dst_points1[[2]] = (dst_points[[2]] + dst_points[[3]]) / 2
         # dst_points2 = dst_points[0, 2, 3]
         # H, _ = cv2.findHomography(src_points1, dst_points1)
         # H2, _ = cv2.findHomography(src_points2, dst_points2)
