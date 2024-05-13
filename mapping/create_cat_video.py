@@ -38,6 +38,7 @@ class CreateCatVideo:
     def load_features_dst_points_all_frames(self):
         for part in self.body_parts:
             csv_file_path = f'./result/dst_points/{part}.csv' 
+            # csv_file_path = f'../csv/{part}.csv'
             df = pd.read_csv(csv_file_path)
 
             # DataFrame `df` has columns named 'x_1', 'y_1', 'x_2', 'y_2', 'x_3', 'y_3', 'x_4', 'y_4'
@@ -160,8 +161,8 @@ class CreateCatVideo:
 
 
 if __name__ == "__main__":
-    dst_type = 'original_man'
-    # dst_type = 'square_man'
+    # dst_type = 'original_man'
+    dst_type = 'square_man'
 
     catVideo = CreateCatVideo()
     frame_size = (catVideo.width, catVideo.height)
