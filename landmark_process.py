@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def generate_transfer():
-    file_path = "./dance_landmarks.csv"
+    file_path = "./csv/dance_landmarks.csv"
     try:
         body = {
             "body_1_x": [],
@@ -104,14 +104,14 @@ def generate_transfer():
         row_num = len(df)
         for row in range(row_num):
             # extract body
-            body_1_x = df.loc[row, 'landmark_12_x']
+            body_1_x = df.loc[row, 'landmark_12_x'] - 0.05
             body_1_y = 1-df.loc[row, 'landmark_12_y']
-            body_2_x = df.loc[row, 'landmark_11_x']
+            body_2_x = df.loc[row, 'landmark_11_x'] + 0.05
             body_2_y = 1-df.loc[row, 'landmark_11_y']
-            body_3_x = (df.loc[row, 'landmark_25_x'] + df.loc[row, 'landmark_23_x']) / 2
-            body_3_y = 1-df.loc[row, 'landmark_25_y']
-            body_4_x = (df.loc[row, 'landmark_26_x'] + df.loc[row, 'landmark_24_x']) / 2
-            body_4_y = 1-df.loc[row, 'landmark_26_y']
+            body_3_x = (df.loc[row, 'landmark_25_x'] + df.loc[row, 'landmark_23_x']) / 2 + 0.05
+            body_3_y = 1-df.loc[row, 'landmark_25_y'] - 0.5
+            body_4_x = (df.loc[row, 'landmark_26_x'] + df.loc[row, 'landmark_24_x']) / 2 - 0.05
+            body_4_y = 1-df.loc[row, 'landmark_26_y'] - 0.5
             if body_4_x > body_3_x:
                 body_4_x, body_3_x = body_3_x, body_4_x
                 body_4_y, body_3_y = body_3_y, body_4_y
@@ -122,9 +122,9 @@ def generate_transfer():
             body['body_2_y'].append(body_2_y)
 
             # extract head
-            head_1_x = df.loc[row, 'landmark_8_x']
+            head_1_x = df.loc[row, 'landmark_8_x'] - 1
             head_1_y = 1-df.loc[row, 'landmark_5_y']
-            head_2_x = df.loc[row, 'landmark_7_x']
+            head_2_x = df.loc[row, 'landmark_7_x'] + 1
             head_2_y = 1-df.loc[row, 'landmark_2_y']
             head_3_x = df.loc[row, 'landmark_7_x']
             head_3_y = body_2_y-0.03
@@ -184,13 +184,13 @@ def generate_transfer():
 
             # extract upper left arm
             upper_left_arm_1_x = df.loc[row, 'landmark_14_x']
-            upper_left_arm_1_y = 1 - df.loc[row, 'landmark_14_y'] - 0.03
+            upper_left_arm_1_y = 1 - df.loc[row, 'landmark_14_y'] - 0.08
             upper_left_arm_2_x = df.loc[row, 'landmark_14_x']
-            upper_left_arm_2_y = upper_left_arm_1_y + 0.06
-            upper_left_arm_3_x = body_1_x + 0.01
+            upper_left_arm_2_y = upper_left_arm_1_y + 0.08*2
+            upper_left_arm_3_x = body_1_x + 0.08
             upper_left_arm_3_y = body_1_y
             m = (body_4_y - body_1_y) / (body_4_x - body_1_x)
-            upper_left_arm_4_y = upper_left_arm_3_y - 0.03
+            upper_left_arm_4_y = upper_left_arm_3_y - 0.08 * 2
             upper_left_arm_4_x = body_1_x + (upper_left_arm_4_y - body_1_y) / m + 0.01
             upper_left_arm['upper_left_arm_1_x'].append(upper_left_arm_1_x)
             upper_left_arm['upper_left_arm_1_y'].append(upper_left_arm_1_y)
@@ -203,13 +203,19 @@ def generate_transfer():
 
             # extract lower left arm
             lower_left_arm_1_x = df.loc[row, 'landmark_18_x']
-            lower_left_arm_1_y = 1 - df.loc[row, 'landmark_20_y'] - 0.015
-            lower_left_arm_2_x = df.loc[row, 'landmark_20_x']
-            lower_left_arm_2_y = 1 - df.loc[row, 'landmark_20_y'] + 0.015
+            lower_left_arm_1_y = 1 - df.loc[row, 'landmark_20_y'] - 0.08 * 2
             lower_left_arm_3_x = upper_left_arm_2_x
             lower_left_arm_3_y = upper_left_arm_2_y
             lower_left_arm_4_x = upper_left_arm_1_x
             lower_left_arm_4_y = upper_left_arm_1_y
+            # lower_left_arm_2_x = df.loc[row, 'landmark_20_x']
+            # lower_left_arm_2_y = 1 - df.loc[row, 'landmark_20_y'] + 0.05
+            lower_left_arm_2_x = lower_left_arm_1_x + lower_left_arm_3_x - lower_left_arm_4_x
+            lower_left_arm_2_y = lower_left_arm_1_y + lower_left_arm_3_y - lower_left_arm_4_y
+            if lower_left_arm_2_y > 0.85:
+                lower_left_arm_2_y = 0.85
+            if lower_left_arm_1_y > 0.85:
+                lower_left_arm_1_y = 0.85
             lower_left_arm['lower_left_arm_1_x'].append(lower_left_arm_1_x)
             lower_left_arm['lower_left_arm_1_y'].append(lower_left_arm_1_y)
             lower_left_arm['lower_left_arm_2_x'].append(lower_left_arm_2_x)
@@ -221,13 +227,13 @@ def generate_transfer():
 
             # extract upper right arm
             upper_right_arm_1_x = df.loc[row, 'landmark_13_x']
-            upper_right_arm_1_y = 1 - df.loc[row, 'landmark_13_y'] + 0.03
+            upper_right_arm_1_y = 1 - df.loc[row, 'landmark_13_y'] + 0.08
             upper_right_arm_2_x = df.loc[row, 'landmark_13_x']
-            upper_right_arm_2_y = upper_right_arm_1_y - 0.06
-            upper_right_arm_4_x = body_2_x - 0.01
+            upper_right_arm_2_y = upper_right_arm_1_y - 0.08*2
+            upper_right_arm_4_x = body_2_x - 0.08
             upper_right_arm_4_y = body_2_y
             m = (body_3_y - body_2_y) / (body_3_x - body_2_x)
-            upper_right_arm_3_y = upper_right_arm_4_y - 0.06
+            upper_right_arm_3_y = upper_right_arm_4_y - 0.08*2
             upper_right_arm_3_x = body_2_x + (upper_right_arm_3_y - body_2_y) / m - 0.01
             upper_right_arm['upper_right_arm_1_x'].append(upper_right_arm_1_x)
             upper_right_arm['upper_right_arm_1_y'].append(upper_right_arm_1_y)
@@ -240,13 +246,19 @@ def generate_transfer():
 
             # extract lower right arm
             lower_right_arm_1_x = df.loc[row, 'landmark_19_x']
-            lower_right_arm_1_y = 1 - df.loc[row, 'landmark_17_y'] + 0.015
-            lower_right_arm_2_x = df.loc[row, 'landmark_17_x']
-            lower_right_arm_2_y = 1 - df.loc[row, 'landmark_17_y'] - 0.015
+            lower_right_arm_1_y = 1 - df.loc[row, 'landmark_17_y'] + 0.08 * 2
+            # lower_right_arm_2_x =
+            # lower_right_arm_2_y =
             lower_right_arm_3_x = upper_right_arm_2_x
             lower_right_arm_3_y = upper_right_arm_2_y
             lower_right_arm_4_x = upper_right_arm_1_x
             lower_right_arm_4_y = upper_right_arm_1_y
+            lower_right_arm_2_x = lower_right_arm_1_x + lower_right_arm_4_x - lower_right_arm_3_x
+            lower_right_arm_2_y = lower_right_arm_1_y + lower_right_arm_4_y - lower_right_arm_3_y
+            if lower_right_arm_2_y > 0.85:
+                lower_right_arm_2_y = 0.85
+            if lower_right_arm_1_y > 0.85:
+                lower_right_arm_1_y = 0.85
             lower_right_arm['lower_right_arm_1_x'].append(lower_right_arm_1_x)
             lower_right_arm['lower_right_arm_1_y'].append(lower_right_arm_1_y)
             lower_right_arm['lower_right_arm_2_x'].append(lower_right_arm_2_x)
@@ -257,21 +269,21 @@ def generate_transfer():
             lower_right_arm['lower_right_arm_4_y'].append(lower_right_arm_4_y)
 
         body_df = pd.DataFrame(body)
-        body_df.to_csv('body.csv', index=False)
+        body_df.to_csv('csv/body.csv', index=False)
         head_df = pd.DataFrame(head)
-        head_df.to_csv('head.csv', index=False)
+        head_df.to_csv('csv/head.csv', index=False)
         left_leg_df = pd.DataFrame(left_leg)
-        left_leg_df.to_csv('left_leg.csv', index=False)
+        left_leg_df.to_csv('csv/left_leg.csv', index=False)
         right_leg_df = pd.DataFrame(right_leg)
-        right_leg_df.to_csv('right_leg.csv', index=False)
+        right_leg_df.to_csv('csv/right_leg.csv', index=False)
         upper_left_arm_df = pd.DataFrame(upper_left_arm)
-        upper_left_arm_df.to_csv('upper_left_arm.csv', index=False)
+        upper_left_arm_df.to_csv('csv/upper_left_arm.csv', index=False)
         lower_left_arm_df = pd.DataFrame(lower_left_arm)
-        lower_left_arm_df.to_csv('lower_left_arm.csv', index=False)
+        lower_left_arm_df.to_csv('csv/lower_left_arm.csv', index=False)
         upper_right_arm_df = pd.DataFrame(upper_right_arm)
-        upper_right_arm_df.to_csv('upper_right_arm.csv', index=False)
+        upper_right_arm_df.to_csv('csv/upper_right_arm.csv', index=False)
         lower_right_arm_df = pd.DataFrame(lower_right_arm)
-        lower_right_arm_df.to_csv('lower_right_arm.csv', index=False)
+        lower_right_arm_df.to_csv('csv/lower_right_arm.csv', index=False)
 
     except FileNotFoundError:
         print(f"Error: The file '{file_path}' does not exist.")

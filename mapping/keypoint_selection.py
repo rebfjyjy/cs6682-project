@@ -16,6 +16,7 @@ class ImageProcess:
             ax.scatter(point[0], point[1], color=color, s=100)  # s is the size of the point
 
     def select_features(self):
+        print(os.path.exists(self.image_path))
         img = cv2.imread(self.image_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         fig, ax = plt.subplots()
@@ -31,8 +32,26 @@ class ImageProcess:
         for part in body_parts:
             plt.title(f'Select the {part}, then press Enter')
             points = plt.ginput(n=4, timeout=0)
+            
+            min_x = int(min(points, key=lambda x: x[0])[0])
+            max_x = int(max(points, key=lambda x: x[0])[0])
+            min_y = int(min(points, key=lambda x: x[1])[1])
+            max_y = int(max(points, key=lambda x: x[1])[1])
+
+            # Ensure the coordinates are within the image boundaries
+            min_x = max(min_x, 0)
+            min_y = max(min_y, 0)
+            max_x = min(max_x, img.shape[1])
+            max_y = min(max_y, img.shape[0])
+
+            # Crop the image
+            cropped_image = img[min_y:max_y, min_x:max_x]
+            # Optionally, save to file
+            cv2.imwrite(f'./images/cropped_image_{part}.png', cropped_image)
+
             self.draw_points(ax, points, 'red')
             plt.draw()
+
             self.points_dict[part] = points
             print(f'{part} points:', points)
 
@@ -60,17 +79,17 @@ class ImageProcess:
         return self.points_dict
 
 
-# # cat keypoint selection
-# image_path = './data/cat.png'
-# csv_path = './result/cat_features.csv'
+# cat keypoint selection
+image_path = './mapping/data/cat.png'
+csv_path = './mapping/result/cat_features_cropped.csv'
 
-# human keypoint selection
-image_path = './data/human.png'
-csv_path = './result/human_features.csv'
+# # human keypoint selection
+# image_path = './data/human.png'
+# csv_path = './result/human_features.csv'
 
 image_process = ImageProcess(image_path=image_path, csv_path=csv_path)
 image_process.select_features()
-image_process.save_points()
+# image_process.save_points()
 
 
 
