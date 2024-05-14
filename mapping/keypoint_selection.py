@@ -15,6 +15,23 @@ class ImageProcess:
         for point in points:
             ax.scatter(point[0], point[1], color=color, s=100)  # s is the size of the point
 
+    def crop_img(self, img, points):
+        min_x = int(min(points, key=lambda x: x[0])[0])
+        max_x = int(max(points, key=lambda x: x[0])[0])
+        min_y = int(min(points, key=lambda x: x[1])[1])
+        max_y = int(max(points, key=lambda x: x[1])[1])
+
+        # Ensure the coordinates are within the image boundaries
+        min_x = max(min_x, 0)
+        min_y = max(min_y, 0)
+        max_x = min(max_x, img.shape[1])
+        max_y = min(max_y, img.shape[0])
+
+        # Crop the image
+        cropped_image = img[min_y:max_y, min_x:max_x]
+        # Optionally, save to file
+        cv2.imwrite(f'./images/cropped_image_{part}.png', cropped_image)
+
     def select_features(self):
         print(os.path.exists(self.image_path))
         img = cv2.imread(self.image_path)
@@ -33,22 +50,7 @@ class ImageProcess:
             plt.title(f'Select the {part}, then press Enter')
             points = plt.ginput(n=4, timeout=0)
             
-            min_x = int(min(points, key=lambda x: x[0])[0])
-            max_x = int(max(points, key=lambda x: x[0])[0])
-            min_y = int(min(points, key=lambda x: x[1])[1])
-            max_y = int(max(points, key=lambda x: x[1])[1])
-
-            # Ensure the coordinates are within the image boundaries
-            min_x = max(min_x, 0)
-            min_y = max(min_y, 0)
-            max_x = min(max_x, img.shape[1])
-            max_y = min(max_y, img.shape[0])
-
-            # Crop the image
-            cropped_image = img[min_y:max_y, min_x:max_x]
-            # Optionally, save to file
-            cv2.imwrite(f'./images/cropped_image_{part}.png', cropped_image)
-
+            self.crop_img(img, points)
             self.draw_points(ax, points, 'red')
             plt.draw()
 

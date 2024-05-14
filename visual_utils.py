@@ -85,7 +85,7 @@ class ProcessVideo:
         command = [
             'ffmpeg', '-i', self.video_path,  # Input video file
             '-i', audio_path,            # Input audio file
-            '-c:v', 'copy',              # Copy video stream directly without re-encoding
+            '-c', 'copy',              # Copy video stream directly without re-encoding
             '-map', '0:v:0',             # Map video stream from the first input to output
             '-map', '1:a:0',             # Map audio stream from the second input to output
             '-shortest',                 # If audio and video lengths differ, cut at the shortest
@@ -177,7 +177,7 @@ class ProcessVideo:
         return output_image
 video_path = './video.mp4'
 csv_path = './dance_landmarks.csv'
-audio_path = './audio.mp3'
+audio_path = './output_audio.wav'
 output_path = './final_result.mp4'
 image_path = './cat_with_background.png'
 
