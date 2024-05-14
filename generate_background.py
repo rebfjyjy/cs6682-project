@@ -12,7 +12,7 @@ import tqdm
 
 def convert_mp3_to_wav(mp3_path, wav_path):
     audio_clip = AudioFileClip(mp3_path)
-    audio_clip.write_audiofile(wav_path, codec='pcm_s16le')  # pcm_s16le is the codec for .wav format
+    audio_clip.write_audiofile(wav_path, codec='pcm_s16le') 
     audio_clip.close()
     print(f"Converted {mp3_path} to {wav_path}")
 
@@ -23,9 +23,7 @@ def read_info(media):
     """
     proc = sp.run([
         'ffprobe', "-loglevel", "panic",
-        str(media), '-print_format', 'json', '-show_format', '-show_streams'
-    ],
-                  capture_output=True)
+        str(media), '-print_format', 'json', '-show_format', '-show_streams'], capture_output=True)
     if proc.returncode:
         raise IOError(f"{media} does not exist or is of a wrong type.")
     return json.loads(proc.stdout.decode('utf-8'))
@@ -33,7 +31,7 @@ def read_info(media):
 
 def read_audio(audio, seek=None, duration=None):
     """
-    Read the `audio` file, starting at `seek` (or 0) seconds for `duration` (or all)  seconds.
+    Read the `audio` file
     Returns `float[channels, samples]`.
     """
 
@@ -70,22 +68,19 @@ def envelope(wav, window, stride):
     Extract the envelope of the waveform `wav` (float[samples]), using average pooling
     with `window` samples and the given `stride`.
     """
-    # pos = np.pad(np.maximum(wav, 0), window // 2)
     wav = np.pad(wav, window // 2)
     out = []
     for off in range(0, len(wav) - window, stride):
         frame = wav[off:off + window]
         out.append(np.maximum(frame, 0).mean())
     out = np.array(out)
-    # Some form of audio compressor based on the sigmoid.
     out = 1.9 * (sigmoid(2.5 * out) - 0.5)
     return out
 
 
 def draw_env(envs, out, fg_color, bg_color, size):
     """
-    draw a single frame using cairo and save it to the `out` file as png. envs is a list of envelopes over channels, each env
-    is a float[bars] representing the height of the envelope to draw. Each entry will be represented by a bar.
+    draw a single frame using cairo and save it to the `out` file as png. Each entry will be represented by a bar.
     """
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
     ctx = cairo.Context(surface)
@@ -133,27 +128,13 @@ def draw_env(envs, out, fg_color, bg_color, size):
 def interpole(x1, y1, x2, y2, x):
     return y1 + (y2 - y1) * (x - x1) / (x2 - x1)
 
-def visualize(audio,
-              tmp,
-              out = Path("generated_background.mp4"),
-              seek=None,
-              duration=None,
-              rate=60,
-              bars=50,
-              speed=4,
-              time=0.4,
-              oversample=3,
-              fg_color=(1.0, 0.0, 0.0),
-              bg_color=(1, 1, 1),
-              size=(1710, 1080),
-              stereo=False,
-              ):
+def visualize(audio, tmp, out = Path("generated_background.mp4"), seek=None, duration=None, rate=60, bars=50, speed=4, time=0.4,oversample=3,
+              fg_color=(1.0, 0.0, 0.0), bg_color=(1, 1, 1), size=(1710, 1080), stereo=False,):
     """
     Generate the visualisation for the `audio` file, using a `tmp` folder and saving the final
     video in `out`.
     `seek` and `durations` gives the extract location if any.
     `rate` is the framerate of the output video.
-
     `bars` is the number of bars in the animation.
     `speed` is the base speed of transition. Depending on volume, actual speed will vary
         between 0.5 and 2 times it.
