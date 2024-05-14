@@ -11,7 +11,7 @@ class CreateCatImage:
         cat_image = cv2.imread(cat_path)
         self.height = cat_image.shape[0]
         self.width = cat_image.shape[1]
-
+        
         # frame size: frame in human dancing video
         human_path = './data/human.png'
         human_image = cv2.imread(human_path)
@@ -21,9 +21,9 @@ class CreateCatImage:
         self.src_points_dict = {}
         self.dst_points_dict = dst_points_dict
         self.body_parts = [
-            "head", "body",
+            "head", "body", 
             "upper_left_arm", "lower_left_arm",
-            "upper_right_arm", "lower_right_arm",
+            "upper_right_arm", "lower_right_arm", 
             "left_leg", "right_leg"
         ]
         # self.body_parts = [
@@ -32,7 +32,7 @@ class CreateCatImage:
 
     def load_features_src_points(self):
         for part in self.body_parts:
-            csv_file_path = f'./result/source_points/{part}_src_pts.csv'
+            csv_file_path = f'./result/source_points/{part}_src_pts.csv' 
             df = pd.read_csv(csv_file_path)
 
             # DataFrame `df` has columns named 'x_1', 'y_1', 'x_2', 'y_2', 'x_3', 'y_3', 'x_4', 'y_4'
@@ -51,39 +51,36 @@ class CreateCatImage:
         canvas = np.ones((self.height, self.width, 4), dtype=np.uint8) * 255
         return canvas
 
-    # def warp_and_blend(self, part_image, src_points, dst_points, canvas, width, height):
-    #     # Compute the homography matrix
-    #     H, _ = cv2.findHomography(src_points, dst_points)
-    #     # H, _ = cv2.getAffineTransform(src_points, dst_points)
-    #
-    #     # Warp the original image to fit the new perspective
-    #     # warped_image = cv2.warpPerspective(part_image, H, (width, height), borderMode=cv2.BORDER_CONSTANT, borderValue=(0,0,0,0))
-    #     warped_image = cv2.warpPerspective(part_image, H, (width, height), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE, borderValue=(0, 0, 0, 0))
-    #     # warped_image = cv2.warpAffine(part_image, H, (width, height), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
-    #
-    #     # Create a mask from the alpha channel of the warped image
-    #     mask = warped_image[:, :, 3]  # Alpha channel
-    #     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)  # Convert mask to 3 channel
-    #     mask = mask / 255.0  # Normalize mask to range [0,1]
-    #
-    #     # Prepare the canvas (convert to float and normalize to range [0,1] for multiplication)
-    #     canvas_float = canvas[:, :, :3].astype(float) / 255
-    #
-    #     # Convert warped image to float and normalize
-    #     warped_float = warped_image[:, :, :3].astype(float) / 255
-    #
-    #     # Blend images using the mask
-    #     combined = (canvas_float * (1 - mask)) + (warped_float * mask)
-    #
-    #     # Convert back to 8-bit
-    #     combined = (combined * 255).astype(np.uint8)
-    #
-    #     # Put back the combined image on the canvas
-    #     canvas[:combined.shape[0], :combined.shape[1], :3] = combined
-    #
-    #     return canvas
+    def warp_and_blend_homography(self, part_image, src_points, dst_points, canvas, width, height):
+        # Compute the homography matrix
+        H, _ = cv2.findHomography(src_points, dst_points)
 
-    def warp_and_blend(self, part_image, src_points, dst_points, canvas, width, height):
+        # Warp the original image to fit the new perspective
+        warped_image = cv2.warpPerspective(part_image, H, (width, height), borderMode=cv2.BORDER_CONSTANT, borderValue=(0,0,0,0))
+
+        # Create a mask from the alpha channel of the warped image
+        mask = warped_image[:, :, 3]  # Alpha channel
+        mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)  # Convert mask to 3 channel
+        mask = mask / 255.0  # Normalize mask to range [0,1]
+
+        # Prepare the canvas (convert to float and normalize to range [0,1] for multiplication)
+        canvas_float = canvas[:, :, :3].astype(float) / 255
+
+        # Convert warped image to float and normalize
+        warped_float = warped_image[:, :, :3].astype(float) / 255
+
+        # Blend images using the mask
+        combined = (canvas_float * (1 - mask)) + (warped_float * mask)
+
+        # Convert back to 8-bit
+        combined = (combined * 255).astype(np.uint8)
+
+        # Put back the combined image on the canvas
+        canvas[:combined.shape[0], :combined.shape[1], :3] = combined
+
+        return canvas
+    
+    def warp_and_blend_affine(self, part_image, src_points, dst_points, canvas, width, height):
         # Compute the homography matrix
         src_points1 = src_points[[0, 1, 2]]
         src_points1[[2]] = (src_points[[2]] + src_points[[3]]) / 2
@@ -123,10 +120,10 @@ class CreateCatImage:
         canvas[:combined.shape[0], :combined.shape[1], :3] = combined
 
         return canvas
-
+ 
 
     def group_features(self):
-
+        
         canvas = self.create_white_paper()
 
         for part in self.body_parts:
@@ -162,9 +159,12 @@ class CreateCatImage:
             #     [71.80275974025972, 711.7367424242423]  # Bottom-left corner
             # ], dtype=np.float32)
             src_points = self.src_points_dict[part]
-
-            canvas = self.warp_and_blend(image, src_points, dst_points, canvas, self.width, self.height)
-
+            
+            if part in ["upper_left_arm", "lower_left_arm", "upper_right_arm", "lower_right_arm"]:
+                canvas = self.warp_and_blend_affine(image, src_points, dst_points, canvas, self.width, self.height)
+            else:
+                canvas = self.warp_and_blend_homography(image, src_points, dst_points, canvas, self.width, self.height)
+            
         return canvas
 
 

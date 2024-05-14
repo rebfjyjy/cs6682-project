@@ -37,7 +37,8 @@ class CreateCatVideo:
     # # dst pnts base on square little man
     def load_features_dst_points_all_frames(self):
         for part in self.body_parts:
-            csv_file_path = f'./result/dst_points/{part}.csv'
+            csv_file_path = f'./result/dst_points/{part}.csv' 
+            # csv_file_path = f'../csv/{part}.csv'
             df = pd.read_csv(csv_file_path)
 
             # DataFrame `df` has columns named 'x_1', 'y_1', 'x_2', 'y_2', 'x_3', 'y_3', 'x_4', 'y_4'
