@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 import pandas as pd
+from select_video_frame import VideoFrame
 
 
 class CreateCatImage:
 
-    def __init__(self, dst_points_dict):
+    def __init__(self, dst_points_dict, frame_num):
         # frame size: cat image
         cat_path = './data/cat.png'
         cat_image = cv2.imread(cat_path)
@@ -18,6 +19,7 @@ class CreateCatImage:
         self.height = human_image.shape[0]
         self.width = human_image.shape[1]
 
+        self.frame_num = frame_num
         self.src_points_dict = {}
         self.dst_points_dict = dst_points_dict
         self.body_parts = [
@@ -49,6 +51,12 @@ class CreateCatImage:
     def create_white_paper(self):
         # Create a blank canvas (white paper)
         canvas = np.ones((self.height, self.width, 4), dtype=np.uint8) * 255
+        return canvas
+    
+    def create_background(self, frame_number):
+        video_path = '../out.mp4'
+        video_frame = VideoFrame(video_path=video_path)
+        canvas = video_frame.select_video_frame(frame_number)
         return canvas
 
     def warp_and_blend_homography(self, part_image, src_points, dst_points, canvas, width, height):
@@ -124,7 +132,8 @@ class CreateCatImage:
 
     def group_features(self):
         
-        canvas = self.create_white_paper()
+        # canvas = self.create_white_paper()
+        canvas = self.create_background(self.frame_num)
 
         for part in self.body_parts:
             image_path = f'./data/{part}.png'

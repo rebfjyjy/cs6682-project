@@ -56,14 +56,14 @@ class FeaturesImageProcess:
 
 if __name__ == "__main__":
 
-    body_parts = [
-        "head", "body", 
-        "upper_left_arm", "lower_left_arm",
-        "upper_right_arm", "lower_right_arm", 
-        "left_leg", "right_leg"
-    ]
+    # body_parts = [
+    #     "head", "body", 
+    #     "upper_left_arm", "lower_left_arm",
+    #     "upper_right_arm", "lower_right_arm", 
+    #     "left_leg", "right_leg"
+    # ]
 
-    # body_parts = ["head"]  # select keypoint for single part
+    body_parts = ["lower_left_arm", "lower_right_arm"]  # select keypoint for single part
 
     for part in body_parts:
         # cat keypoint selection
@@ -72,4 +72,4 @@ if __name__ == "__main__":
 
         cat_process = FeaturesImageProcess(part=part, image_path=image_path, csv_path=csv_path)
         cat_process.select_features()
-        # cat_process.save_points()
+        cat_process.save_points()

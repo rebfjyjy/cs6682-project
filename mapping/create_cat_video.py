@@ -96,7 +96,7 @@ class CreateCatVideo:
         elif dst_type == 'original_man':
             dst_points_dict = self.create_dst_points_dict_original_man(frame_num=frame_num)    # dst pnts from original man in the video
         # print(dst_points_dict)
-        catImage = CreateCatImage(dst_points_dict)
+        catImage = CreateCatImage(dst_points_dict, frame_num)
         output_image = catImage.get_cat_image()
         return output_image
 
@@ -140,9 +140,9 @@ class CreateCatVideo:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_video_path, fourcc, fps, frame_size)
 
-        # video_total_frame_num = len(self.all_frames_dst_pts['head'])
+        video_total_frame_num = len(self.all_frames_dst_pts['head'])
         # print(video_total_frame_num)  # 2509
-        video_total_frame_num = 30     # comment out this line if want to create the full-length video
+        # video_total_frame_num = 20     # comment out this line if want to create the full-length video
 
         for frame_num in range(video_total_frame_num):  # Loop through each frame
             frame = self.one_frame_cat(frame_num, 'square_man')
@@ -170,8 +170,9 @@ if __name__ == "__main__":
         output_video_path = './result/cat_video_original.mp4'
         catVideo.create_video_from_frames_original_man(output_video_path, fps=6, frame_size=frame_size)
     elif dst_type == 'square_man':
-        output_video_path = './result/cat_video_square.mp4'
-        catVideo.create_video_from_frames_square_man(output_video_path, fps=6, frame_size=frame_size)
+        # output_video_path = './result/cat_video_square.mp4'
+        output_video_path = './result/cat_video_with_background.mp4'
+        catVideo.create_video_from_frames_square_man(output_video_path, fps=30, frame_size=frame_size)
 
     # # Display the final output
     # cv2.imshow('Warped Image on Canvas', output_image)
